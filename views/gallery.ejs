@@ -22,20 +22,75 @@
         <!-- Main Css -->
         <link href="/libs/%40mdi/font/css/materialdesignicons.min.css" rel="stylesheet" type="text/css">
         <link href="/css/tailwind.min.css" rel="stylesheet" type="text/css">
-
+        <style>
+            .package-item {
+                transition: all 0.3s ease;
+            }
+    
+            .category-btn {
+                transition: all 0.2s ease;
+            }
+    
+            /* Add these styles to your existing CSS */
+            .has-submenu {
+                position: relative;
+            }
+    
+            .submenu {
+                display: none;
+                position: absolute;
+                min-width: 200px;
+                background: white;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                z-index: 1000;
+            }
+    
+            .has-submenu:hover .submenu {
+                display: block;
+            }
+    
+            .sub-submenu {
+                display: none;
+                position: absolute;
+                left: 100%;
+                top: 0;
+                min-width: 200px;
+                background: white;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            }
+    
+            .parent-menu-item:hover .sub-submenu {
+                display: block;
+            }
+    
+            .menu-arrow,
+            .submenu-arrow {
+                display: inline-block;
+                margin-left: 5px;
+                transition: transform 0.3s;
+            }
+    
+            .has-submenu:hover .menu-arrow,
+            .parent-menu-item:hover .submenu-arrow {
+                transform: rotate(180deg);
+            }
+            /* Hide dropdowns on mobile */
+    @media (max-width: 767px) {
+        .menu-arrow,
+        .submenu-arrow,
+        .submenu,
+        .sub-submenu {
+            display: none !important;
+        }
+        
+        #packageLink {
+            pointer-events: auto !important;
+        }
+    }
+        </style>
     </head>
     
     <body class="dark:bg-slate-900">
-        <!-- Loader Start -->
-        <div id="preloader">
-            <div id="status">
-                <div class="spinner">
-                    <div class="double-bounce1"></div>
-                    <div class="double-bounce2"></div>
-                </div>
-            </div>
-        </div>
-        <!-- Loader End -->
         <!-- Start Navbar -->
         <nav id="topnav" class="defaultscroll is-sticky ">
             <div class="container relative">
@@ -75,19 +130,39 @@
                        
                         </li>
 
-                        <li class="has-submenu parent-parent-menu-item"><a href="javascript:void(0)" id="packageLink"> Packages </a><span class="menu-arrow"></span>
-                            <ul class="submenu">
-                                <li class=" parent-menu-item">
-                                    <a href="category.html">Category-1 </a></span>
-                                  
-                                </li>
-
-                                <li class=" parent-menu-item">
-                                    <a href="category.html">Category-2  </a></span>
-                                   
-                                </li>
-
-                            
+                        <li class="has-submenu parent-parent-menu-item">
+                            <a href="/packages" id="packageLink">Packages</a>
+                            <!-- Hide dropdown arrows on mobile -->
+                            <span class="menu-arrow hidden md:inline-block"></span>
+                            <!-- Hide submenu completely on mobile -->
+                            <ul class="submenu hidden md:block">
+                                <% categories.forEach(category => { %>
+                                    <% if (category.subCategories && category.subCategories.length > 0) { %>
+                                        <li class="parent-menu-item has-submenu">
+                                            <a href="/packages?category=<%= category._id %>">
+                                                <%= category.name %>
+                                            </a>
+                                            <span class="submenu-arrow hidden md:inline-block"></span>
+                                            <ul class="sub-submenu hidden md:block">
+                                                <% category.subCategories.forEach(subCategory => { %>
+                                                    <% if (subCategory.isActive) { %>
+                                                        <li>
+                                                            <a href="/package-details?subCategory=<%= subCategory._id %>">
+                                                                <%= subCategory.name %>
+                                                            </a>
+                                                        </li>
+                                                    <% } %>
+                                                <% }) %>
+                                            </ul>
+                                        </li>
+                                    <% } else { %>
+                                        <li>
+                                            <a href="/packages?category=<%= category._id %>">
+                                                <%= category.name %>
+                                            </a>
+                                        </li>
+                                    <% } %>
+                                <% }) %>
                             </ul>
                         </li>
                 
@@ -117,7 +192,7 @@
             <div class="absolute inset-0 bg-gradient-to-b from-slate-900/60 via-slate-900/80 to-slate-900"></div>
             <div class="container relative">
                 <div class="grid grid-cols-1 pb-8 text-center mt-10">
-                    <h3 class="text-4xl leading-normal tracking-wider font-semibold text-white">Joanna Holidays</h3>
+                    <h3 class="text-4xl leading-normal tracking-wider font-semibold text-white">JOANNA GALLERY</h3>
                 </div><!--end grid-->
             </div><!--end container-->
             
@@ -133,63 +208,46 @@
 
         <!-- Start -->
         <section class="relative md:py-24 py-16">
-   
-
-
             <div class="container relative md:mt-24 mt-16">
-                <div class="grid grid-cols-1 pb-6 text-center">
-                    <h3 class="mb-6 md:text-3xl text-2xl md:leading-normal leading-normal font-semibold">Our Gallery</h3>
-
-                    <p class="text-slate-400 max-w-xl mx-auto">Discover unforgettable getaways with Joanna Holidays. Perfect destinations, seamless experiences, and memories that last a lifetime!
-
-
-
-
-
-
-
-                        .</p>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
+                    <% gallery.forEach(item => { %>
+                        <div class="group relative overflow-hidden aspect-square">
+                            <div class="relative w-full h-full overflow-hidden rounded-md shadow-sm dark:shadow-gray-800">
+                                <a class="lightbox block w-full h-full" href="<%= item.imageUrl %>">
+                                    <img 
+                                        src="<%= item.imageUrl %>" 
+                                        class="w-full h-full object-cover group-hover:scale-110 group-hover:rotate-3 duration-500 transition-transform" 
+                                        alt="<%= item.title || 'Gallery Image' %>"
+                                        loading="lazy"
+                                    >
+                                </a>
+                            </div>
+                        </div><!--end content-->
+                    <% }) %>
                 </div><!--end grid-->
 
-                <div class="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 mt-6 gap-6">
-                    <div class="group relative overflow-hidden">
-                        <div class="relative overflow-hidden rounded-md shadow-sm dark:shadow-gray-800">
-                            <a class="lightbox d-inline-block" href="/images/blog/1.jpg">
-                            <img src="/images/blog/1.jpg" class="group-hover:scale-110 group-hover:rotate-3 duration-500" alt="">
-                           </a>
-                        </div>
-
-                 
-                    </div><!--end content-->
-                    
-                    <div class="group relative overflow-hidden">
-                        <div class="relative overflow-hidden rounded-md shadow-sm dark:shadow-gray-800">
-                            <a class="lightbox d-inline-block" href="/images/blog/1.jpg">
-                            <img src="/images/blog/1.jpg" class="group-hover:scale-110 group-hover:rotate-3 duration-500" alt="">
-                           </a>
-                        </div>
-
-                  
-                    </div><!--end content-->
-                    
-                    <div class="group relative overflow-hidden">
-                        <div class="relative overflow-hidden rounded-md shadow-sm dark:shadow-gray-800">
-                            <a class="lightbox d-inline-block" href="/images/blog/1.jpg">
-                            <img src="/images/blog/1.jpg" class="group-hover:scale-110 group-hover:rotate-3 duration-500" alt="">
-                           </a>
-                        </div>
-                    </div><!--end content-->
-                </div><!--end grid-->
+                <!-- Pagination -->
+                <div class="flex justify-center mt-8 gap-2">
+                    <% if (currentPage > 1) { %>
+                        <a href="?page=<%= currentPage - 1 %>&limit=12" class="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700">Previous</a>
+                    <% } %>
+                    <% for (let i = 1; i <= totalPages; i++) { %>
+                        <a href="?page=<%= i %>&limit=12" class="px-4 py-2 <%= currentPage === i ? 'bg-red-500 text-white' : 'bg-gray-800 text-white hover:bg-gray-700' %> rounded"><%= i %></a>
+                    <% } %>
+                    <% if (currentPage < totalPages) { %>
+                        <a href="?page=<%= currentPage + 1 %>&limit=12" class="px-4 py-2 bg-gray-800 text-white rounded hover:bg-gray-700">Next</a>
+                    <% } %>
+                </div>
             </div><!--end container-->
         </section><!--end section-->
-        <!-- End -->
+   
+
 
         <!-- Insta Post Start -->
 
         <!-- Insta Post End -->
 
-        <!-- Footer Start -->
-        <footer class="footer bg-slate-900 dark:bg-slate-800 relative text-gray-200 dark:text-gray-200">    
+        <footer class="footer bg-slate-900 dark:bg-slate-800 relative text-gray-200 dark:text-gray-200">
             <div class="container relative">
                 <div class="grid grid-cols-12">
                     <div class="col-span-12">
@@ -199,80 +257,113 @@
                                     <a href="#" class="text-[22px] ft-logo focus:outline-none">
                                         <img class="" src="/images/joannalogo.png" alt="">
                                     </a>
-                                    <p class="mt-6 text-gray-300">Planning for a trip? We will organize your trip with the best places and within best budget!</p>
+                                    <p class="mt-6 text-gray-300">Planning for a trip? We will organize your trip with the
+                                        best places and within best budget!</p>
                                     <ul class="list-none mt-6">
-                                       
-                                       
-                                        
-                                        <li class="inline"><a href="https://www.facebook.com/joannaholidays1/" target="_blank" class="size-8 inline-flex items-center justify-center tracking-wide align-middle text-base border border-gray-800 dark:border-gray-700 rounded-md hover:bg-red-500 hover:text-white text-slate-300"><i data-feather="facebook" class="size-4 align-middle" title="facebook"></i></a></li>
-                                        <li class="inline"><a href="https://www.instagram.com/joannaholidays/?hl=en" target="_blank" class="size-8 inline-flex items-center justify-center tracking-wide align-middle text-base border border-gray-800 dark:border-gray-700 rounded-md hover:bg-red-500 hover:text-white text-slate-300"><i data-feather="instagram" class="size-4 align-middle" title="instagram"></i></a></li>
-                                        <li class="inline"><a href="#" target="_blank" class="size-8 inline-flex items-center justify-center tracking-wide align-middle text-base border border-gray-800 dark:border-gray-700 rounded-md hover:bg-red-500 hover:text-white text-slate-300"><i data-feather="twitter" class="size-4 align-middle" title="twitter"></i></a></li>
+    
+    
+    
+                                        <li class="inline"><a href="https://www.facebook.com/joannaholidays1/"
+                                                target="_blank"
+                                                class="size-8 inline-flex items-center justify-center tracking-wide align-middle text-base border border-gray-800 dark:border-gray-700 rounded-md hover:bg-red-500 hover:text-white text-slate-300"><i
+                                                    data-feather="facebook" class="size-4 align-middle"
+                                                    title="facebook"></i></a></li>
+                                        <li class="inline"><a href="https://www.instagram.com/joannaholidays/?hl=en"
+                                                target="_blank"
+                                                class="size-8 inline-flex items-center justify-center tracking-wide align-middle text-base border border-gray-800 dark:border-gray-700 rounded-md hover:bg-red-500 hover:text-white text-slate-300"><i
+                                                    data-feather="instagram" class="size-4 align-middle"
+                                                    title="instagram"></i></a></li>
+                                        <li class="inline"><a href="#" target="_blank"
+                                                class="size-8 inline-flex items-center justify-center tracking-wide align-middle text-base border border-gray-800 dark:border-gray-700 rounded-md hover:bg-red-500 hover:text-white text-slate-300"><i
+                                                    data-feather="twitter" class="size-4 align-middle"
+                                                    title="twitter"></i></a></li>
                                         <li class="inline"><a href="mailto:
-                                            admin@joannaholidays.com" class="size-8 inline-flex items-center justify-center tracking-wide align-middle text-base border border-gray-800 dark:border-gray-700 rounded-md hover:bg-red-500 hover:text-white text-slate-300"><i data-feather="mail" class="size-4 align-middle" title="email"></i></a></li>
+                                                admin@joannaholidays.com"
+                                                class="size-8 inline-flex items-center justify-center tracking-wide align-middle text-base border border-gray-800 dark:border-gray-700 rounded-md hover:bg-red-500 hover:text-white text-slate-300"><i
+                                                    data-feather="mail" class="size-4 align-middle" title="email"></i></a>
+                                        </li>
                                     </ul><!--end icon-->
                                 </div><!--end col-->
-
+    
                                 <div class="lg:col-span-3 md:col-span-4">
                                     <div class="lg:ms-8">
                                         <h5 class="tracking-[1px] text-gray-100 font-semibold">Office</h5>
                                         <h5 class="tracking-[1px] text-gray-100 mt-6">Joanna Holidays</h5>
-
+    
                                         <div class="flex mt-4">
                                             <i data-feather="map-pin" class="size-4 text-red-500 me-2 mt-1"></i>
                                             <div class="">
                                                 <h6 class="text-gray-300">
-                                                    61/3823-A2-1st Floor,  Online Tower Ravipuram Road, <br> Behind MG Road Cochin, 682018</h6>
+                                                    61/3823-A2-1st Floor, Online Tower Ravipuram Road, <br> Behind MG Road
+                                                    Cochin, 682018</h6>
                                             </div>
                                         </div>
-
+    
                                         <div class="flex mt-4">
                                             <i data-feather="mail" class="size-4 text-red-500 me-2 mt-1"></i>
                                             <div class="">
-                                                <a href="mailto: admin@joannaholidays.com" class="text-slate-300 hover:text-slate-400 duration-500 ease-in-out"> admin@joannaholidays.com</a>
+                                                <a href="mailto: admin@joannaholidays.com"
+                                                    class="text-slate-300 hover:text-slate-400 duration-500 ease-in-out">
+                                                    admin@joannaholidays.com</a>
                                             </div>
                                         </div>
-                        
+    
                                         <div class="flex mt-4">
                                             <i data-feather="phone" class="size-4 text-red-500 me-2 mt-1"></i>
                                             <div class="">
                                                 <a href="tel:
-                                                +918086602888" class="text-slate-300 hover:text-slate-400 duration-500 ease-in-out">
+                                                    +918086602888"
+                                                    class="text-slate-300 hover:text-slate-400 duration-500 ease-in-out">
                                                     +91 8086602888</a>
                                             </div>
                                         </div>
                                     </div>
                                 </div><!--end col-->
-                
+    
                                 <div class="lg:col-span-3 md:col-span-4">
                                     <div class="lg:ms-8">
                                         <h5 class="tracking-[1px] text-gray-100 font-semibold">Company</h5>
                                         <ul class="list-none footer-list mt-6">
-                                            <li><a href="/" class="text-gray-300 hover:text-gray-400 duration-500 ease-in-out"><i class="mdi mdi-chevron-right"></i> Home</a></li>
-                                            <li class="mt-[10px]"><a href="/about" class="text-gray-300 hover:text-gray-400 duration-500 ease-in-out"><i class="mdi mdi-chevron-right"></i> About Us</a></li>
-                                            
-                                            <li class="mt-[10px]"><a href="packages.html" class="text-gray-300 hover:text-gray-400 duration-500 ease-in-out"><i class="mdi mdi-chevron-right"></i> Packages</a></li>
-                                            <li class="mt-[10px]"><a href="/blogs" class="text-gray-300 hover:text-gray-400 duration-500 ease-in-out"><i class="mdi mdi-chevron-right"></i> Blog</a></li>
-                                            <li class="mt-[10px]"><a href="/contact" class="text-gray-300 hover:text-gray-400 duration-500 ease-in-out"><i class="mdi mdi-chevron-right"></i> Contact Us</a></li>
-                                            <li class="mt-[10px]"><a href="privacy.html" class="text-gray-300 hover:text-gray-400 duration-500 ease-in-out"><i class="mdi mdi-chevron-right"></i> Privacy & Policy</a></li>
-                                            <li class="mt-[10px]"><a href="terms.html" class="text-gray-300 hover:text-gray-400 duration-500 ease-in-out"><i class="mdi mdi-chevron-right"></i> Terms & conditions </a></li>
+                                            <li><a href="/"
+                                                    class="text-gray-300 hover:text-gray-400 duration-500 ease-in-out"><i
+                                                        class="mdi mdi-chevron-right"></i> Home</a></li>
+                                            <li class="mt-[10px]"><a href="/about"
+                                                    class="text-gray-300 hover:text-gray-400 duration-500 ease-in-out"><i
+                                                        class="mdi mdi-chevron-right"></i> About Us</a></li>
+    
+                                            <li class="mt-[10px]"><a href="/packages"
+                                                    class="text-gray-300 hover:text-gray-400 duration-500 ease-in-out"><i
+                                                        class="mdi mdi-chevron-right"></i> Packages</a></li>
+                                            <li class="mt-[10px]"><a href="/blogs"
+                                                    class="text-gray-300 hover:text-gray-400 duration-500 ease-in-out"><i
+                                                        class="mdi mdi-chevron-right"></i> Blog</a></li>
+                                            <li class="mt-[10px]"><a href="/contact"
+                                                    class="text-gray-300 hover:text-gray-400 duration-500 ease-in-out"><i
+                                                        class="mdi mdi-chevron-right"></i> Contact Us</a></li>
+                                           
                                         </ul>
                                     </div>
                                 </div><!--end col-->
     
                                 <div class="lg:col-span-3 md:col-span-4">
                                     <h5 class="tracking-[1px] text-gray-100 font-semibold">Enquiry</h5>
-                                    <p class="mt-6">Stay connected with Joanna Holidays for booking Or enquiries reach out to us anytime</p>
+                                    <p class="mt-6">Stay connected with Joanna Holidays for booking Or enquiries reach out
+                                        to us anytime</p>
                                     <form>
                                         <div class="grid grid-cols-1">
                                             <div class="my-3">
-                                                
+    
                                                 <div class="form-icon relative mt-2">
                                                     <i data-feather="mail" class="size-4 absolute top-3 start-4"></i>
-                                                    <input type="text" class="ps-12 rounded w-full py-2 px-3 h-10 bg-gray-800 dark:bg-gray-700 border-0 text-gray-100 focus:shadow-none focus:ring-0 placeholder:text-gray-200 outline-none" placeholder="Type your enquiry message" name="email" required="">
+                                                    <input type="text"
+                                                        class="ps-12 rounded w-full py-2 px-3 h-10 bg-gray-800 dark:bg-gray-700 border-0 text-gray-100 focus:shadow-none focus:ring-0 placeholder:text-gray-200 outline-none"
+                                                        placeholder="Type your enquiry message" name="email" required="">
                                                 </div>
                                             </div>
-                                        
-                                            <button type="submit" id="submitsubscribe" name="send" class="py-2 px-5 inline-block font-semibold tracking-wide align-middle duration-500 text-base text-center bg-red-500 text-white rounded-md">SEND ENQUIRY</button>
+    
+                                            <button type="submit" id="submitsubscribe" name="send"
+                                                class="py-2 px-5 inline-block font-semibold tracking-wide align-middle duration-500 text-base text-center bg-red-500 text-white rounded-md">SEND
+                                                ENQUIRY</button>
                                         </div>
                                     </form>
                                 </div><!--end col-->
@@ -281,34 +372,35 @@
                     </div>
                 </div><!--end grid-->
             </div><!--end container-->
-
-            <div class="py-[30px] px-0 border-t border-gray-800 dark:border-gray-700">
-                <div class="container relative text-center">
-                    <div class="grid grid-cols-1">
-                        <div class="text-center footer-copyright-text">
-                            <p class="mb-0">© <script>document.write(new Date().getFullYear())</script>  Joanna Holidays All rights reserved </p>
+    
+            <div class="py-5 px-0 border-t border-gray-800 dark:border-gray-700">
+                <div class="container">
+                    <div class="flex flex-wrap items-center justify-between gap-4">
+                        <!-- Copyright text -->
+                        <div class="text-gray-400 dark:text-gray-300 text-sm">
+                            © <span id="currentYear"></span> <span style="color: red;">Joanna Holidays</span>. All rights reserved. | Designed and developed by <span style="color: burlywood;">Harsh Adz Creators</span> 
                         </div>
-                    </div><!--end grid-->
-                </div><!--end container-->
+                        
+                        <!-- Legal links -->
+                        <div class="flex items-center gap-4">
+                            <a href="privacy.html" 
+                               class="text-gray-400 dark:text-gray-300 hover:text-gray-500 dark:hover:text-gray-400 text-sm transition-colors duration-300 flex items-center">
+                                <i class="mdi mdi-chevron-right text-xs mr-1"></i> Privacy Policy
+                            </a>
+                            <a href="terms.html" 
+                               class="text-gray-400 dark:text-gray-300 hover:text-gray-500 dark:hover:text-gray-400 text-sm transition-colors duration-300 flex items-center">
+                                <i class="mdi mdi-chevron-right text-xs mr-1"></i> Terms & Conditions
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <script>
+                    document.getElementById('currentYear').textContent = new Date().getFullYear();
+                </script>
             </div>
         </footer><!--end footer-->
         <!-- Footer End -->
-        <!-- Switcher -->
-        <div class="fixed top-1/4 -left-2 z-50">
-            <span class="relative inline-block rotate-90">
-                <input type="checkbox" class="checkbox opacity-0 absolute" id="chk">
-                <label class="label bg-slate-900 dark:bg-white shadow-sm dark:shadow-gray-800 cursor-pointer rounded-full flex justify-between items-center p-1 w-14 h-8" for="chk">
-                    <i data-feather="moon" class="w-[18px] h-[18px] text-yellow-500"></i>
-                    <i data-feather="sun" class="w-[18px] h-[18px] text-yellow-500"></i>
-                    <span class="ball bg-white dark:bg-slate-900 rounded-full absolute top-[2px] left-[2px] w-7 h-7"></span>
-                </label>
-            </span>
-        </div>
-
-        <!-- <div class="fixed top-1/2 -right-11 z-50 hidden sm:block">
-            <a href="https://1.envato.market/travosy" target="_blank" class="py-1 px-3 relative inline-block rounded-t-md -rotate-90 bg-white dark:bg-slate-900 shadow-md dark:shadow-sm dark:shadow-gray-800 font-semibold"><i class="mdi mdi-cart-outline me-1"></i> Download</a>
-        </div> -->
-        <!-- Switcher -->
+  
 
 
 

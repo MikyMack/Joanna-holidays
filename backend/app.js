@@ -37,10 +37,7 @@ app.use('/', adminRoutes);
 app.use('/api/auth', authRoutes); 
 app.use('/', apiRoutes); 
 
-// Error Handling for 404
-// app.use(async (req, res) => {
-//     const logos = await Logo.find();
-//     const categories = await Category.find();
-//     res.status(404).render('errorPage', { title: 'Page Not Found', logos,categories });
-// });
+app.use(async (req, res) => {
+    res.status(404).render('errorPage', { title: 'Page Not Found' });
+});
 module.exports = app;

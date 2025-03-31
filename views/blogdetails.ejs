@@ -3,7 +3,7 @@
     
 <head>
         <meta charset="UTF-8">
-        <title>Joanna Holidays | Blogs</title>
+        <title>Joanna Holidays | BlogDetails</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <meta content="Tour & Travels Agency Tailwind CSS Template" name="description">
         <meta content="Tour, Travels, agency, business, corporate, tour packages, journey, trip, tailwind css, Admin, Landing" name="keywords">
@@ -17,10 +17,10 @@
         <link rel="shortcut icon" href="/images/joannalogo.png">
 
         <!-- Css -->
+        <link href="/css/style.css" rel="stylesheet">
         <!-- Main Css -->
         <link href="/libs/%40mdi/font/css/materialdesignicons.min.css" rel="stylesheet" type="text/css">
         <link href="/css/tailwind.min.css" rel="stylesheet" type="text/css">
-        <link href="/css/style.css" rel="stylesheet">
         <style>
             .package-item {
                 transition: all 0.3s ease;
@@ -107,7 +107,17 @@
     </head>
     
     <body class="dark:bg-slate-900">
-       
+        <!-- Loader Start -->
+        <!-- <div id="preloader">
+            <div id="status">
+                <div class="spinner">
+                    <div class="double-bounce1"></div>
+                    <div class="double-bounce2"></div>
+                </div>
+            </div>
+        </div> -->
+        <!-- Loader End -->
+        <!-- Start Navbar -->
         <nav id="topnav" class="defaultscroll is-sticky ">
             <div class="container relative">
                 <!-- Logo container-->
@@ -145,7 +155,6 @@
                             <a href="/">Home</a><span class="menu-arrow"></span>
                        
                         </li>
-
                         <li class="has-submenu parent-parent-menu-item">
                             <a href="/packages" id="packageLink">Packages</a>
                             <!-- Hide dropdown arrows on mobile -->
@@ -204,11 +213,17 @@
         <!-- End Navbar -->
         
         <!-- Start Hero -->
-        <section  style="background-image: url('/images/listing/10.jpg');" class="relative table w-full items-center py-36  bg-top bg-no-repeat bg-cover">
+        <section style="background-image: url('<%= blog.imageUrl %>');" class="relative table w-full items-center py-36  bg-top bg-no-repeat bg-cover">
             <div class="absolute inset-0 bg-gradient-to-b from-slate-900/60 via-slate-900/80 to-slate-900"></div>
             <div class="container relative">
                 <div class="grid grid-cols-1 pb-8 text-center mt-10">
-                    <h3 class="text-4xl leading-normal tracking-wider font-semibold text-white">Blogs / News</h3>
+                    <h3 class="text-4xl leading-normal tracking-wider font-semibold text-white"><%= blog.title %></h3>
+
+                    <ul class="list-none mt-6">
+                        <li class="inline-block text-white/50 mx-5"> <span class="text-white block">Author :</span> <span class="block"><%= blog.author %></span></li>
+                        <li class="inline-block text-white/50 mx-5"> <span class="text-white block">Date :</span> <span class="block"><%= new Date(blog.createdAt).toLocaleDateString() %></span></li>
+                        <li class="inline-block text-white/50 mx-5"> <span class="text-white block">Time :</span> <span class="block">8 Min Read</span></li>
+                    </ul>
                 </div><!--end grid-->
             </div><!--end container-->
             
@@ -216,7 +231,7 @@
                 <ul class="tracking-[0.5px] mb-0 inline-block">
                     <li class="inline-block uppercase text-[13px] font-bold duration-500 ease-in-out text-white/50 hover:text-white"><a href="/">Home</a></li>
                     <li class="inline-block text-base text-white/50 mx-0.5 ltr:rotate-0 rtl:rotate-180"><i class="mdi mdi-chevron-right"></i></li>
-                    <li class="inline-block uppercase text-[13px] font-bold duration-500 ease-in-out text-white" aria-current="page">Blogs</li>
+                    <li class="inline-block uppercase text-[13px] font-bold duration-500 ease-in-out text-white" aria-current="page">Blog Detail</li>
                 </ul>
             </div>
         </section><!--end section-->
@@ -224,60 +239,75 @@
 
         <!-- Start -->
         <section class="relative md:py-24 py-16">
-            <div class="container relative">
-                <div class="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-6">
-                    <% blogs.forEach(function(blog) { %>
-                    <div class="group relative overflow-hidden">
+            <div class="container">
+                <div class="grid md:grid-cols-12 grid-cols-1 gap-6">
+                    <div class="lg:col-span-8 md:col-span-6">
                         <div class="relative overflow-hidden rounded-md shadow-sm dark:shadow-gray-800">
-                            <img src="<%= blog.imageUrl %>" class="group-hover:scale-110 group-hover:rotate-3 duration-500 w-full md:w-[300px]" alt="" style="height: 300px; object-fit: cover;">
-                            <div class="absolute top-0 start-0 p-4 opacity-0 group-hover:opacity-100 duration-500">
-                                <span class="bg-red-500 text-white text-[12px] px-2.5 py-1 font-medium rounded-md h-5"><%= blog.category %></span>
+
+                            <img src="<%= blog.imageUrl %>" alt="">
+
+                            <div class="p-6">
+                                <p class="text-slate-400"><%= blog.content %></p>
                             </div>
                         </div>
 
-                        <div class="mt-6">
-                            <div class="flex mb-4">
-                                <span class="flex items-center text-slate-400 text-sm"><i data-feather="clock" class="size-4 text-slate-900 dark:text-white me-1.5"></i><%= blog.readTime %> min read</span>
-                                <span class="text-slate-400 text-sm ms-3">by <a href="#" class="text-slate-900 dark:text-white hover:text-red-500 dark:hover:text-red-500 font-medium"><%= blog.author %></a></span>
+                    
+                    </div>
+
+                    <div class="lg:col-span-4 md:col-span-6">
+                        <div class="sticky top-20">
+                            <h5 class="text-lg font-medium bg-gray-50 dark:bg-slate-800 shadow-sm dark:shadow-gray-800 rounded-md p-2 text-center">Author</h5>
+                            <div class="text-center mt-8">
+                                <img src="/images/dummy.jpg" class="h-20 w-20 mx-auto rounded-full shadow-sm mb-4" alt="">
+
+                                <a href="#" class="text-lg font-medium hover:text-red-500 transition-all duration-500 ease-in-out h5"><%= blog.author %></a>
+                                <p class="text-slate-400">Content Writer</p>
                             </div>
 
-                            <a href="/blogdetails?id=<%= blog._id %>" class="text-lg font-medium hover:text-red-500 duration-500 ease-in-out"><%= blog.title %></a>
-                            <p class="text-slate-400 mt-2"><%= blog.description %></p>
+                            <h5 class="text-lg font-medium bg-gray-50 dark:bg-slate-800 shadow-sm dark:shadow-gray-800 rounded-md p-2 text-center mt-8">Social sites</h5>
+                            <ul class="list-none text-center mt-8 space-x-0.5">
+                                <li class="inline"><a href="https://www.facebook.com/joannaholidays1/" class="size-8 inline-flex items-center justify-center tracking-wide align-middle text-base border border-gray-100 dark:border-gray-800 rounded-md text-slate-400 hover:border-red-500 hover:text-white hover:bg-red-500"><i data-feather="facebook" class="size-4"></i></a></li>
+                                <li class="inline"><a href="https://www.instagram.com/joannaholidays/?hl=en" class="size-8 inline-flex items-center justify-center tracking-wide align-middle text-base border border-gray-100 dark:border-gray-800 rounded-md text-slate-400 hover:border-red-500 hover:text-white hover:bg-red-500"><i data-feather="instagram" class="size-4"></i></a></li>
+                                <li class="inline"><a href="#" class="size-8 inline-flex items-center justify-center tracking-wide align-middle text-base border border-gray-100 dark:border-gray-800 rounded-md text-slate-400 hover:border-red-500 hover:text-white hover:bg-red-500"><i data-feather="twitter" class="size-4"></i></a></li>
+                                <li class="inline"><a href="#" class="size-8 inline-flex items-center justify-center tracking-wide align-middle text-base border border-gray-100 dark:border-gray-800 rounded-md text-slate-400 hover:border-red-500 hover:text-white hover:bg-red-500"><i data-feather="linkedin" class="size-4"></i></a></li>
 
-                            <div class="mt-3">
-                                <a href="/blogdetails?id=<%= blog._id %>" class="hover:text-red-500 inline-flex items-center">Read More <i data-feather="chevron-right" class="size-4 ms-1"></i></a>
-                            </div>
+                              
+                            </ul><!--end icon-->
                         </div>
-                    </div><!--end content-->
-                    <% }); %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container lg:mt-24 mt-16">
+                <div class="grid grid-cols-1 mb-6 text-center">
+                    <h3 class="font-semibold text-3xl leading-normal">Related Blogs</h3>
                 </div><!--end grid-->
 
-                <div class="grid md:grid-cols-12 grid-cols-1 mt-6">
-                    <div class="md:col-span-12 text-center">
-                        <nav aria-label="Page navigation example">
-                            <ul class="inline-flex items-center -space-x-px">
-                                <% if (currentPage > 1) { %>
-                                <li>
-                                    <a href="/blogs?page=<%= currentPage - 1 %>&limit=10" class="size-[40px] inline-flex justify-center items-center text-slate-400 bg-white dark:bg-slate-900 rounded-s-3xl hover:text-white border border-gray-100 dark:border-gray-800 hover:border-red-500 dark:hover:border-red-500 hover:bg-red-500 dark:hover:bg-red-500">
-                                        <i data-feather="chevron-left" class="size-5 rtl:rotate-180 rtl:-mt-1"></i>
-                                    </a>
-                                </li>
-                                <% } %>
-                                <% for (let i = 1; i <= totalPages; i++) { %>
-                                <li>
-                                    <a href="/blogs?page=<%= i %>&limit=10" class="size-[40px] inline-flex justify-center items-center <%= currentPage === i ? 'text-white bg-red-500 border-red-500' : 'text-slate-400 hover:text-white bg-white dark:bg-slate-900 border border-gray-100 dark:border-gray-800 hover:border-red-500 dark:hover:border-red-500 hover:bg-red-500 dark:hover:bg-red-500' %>"><%= i %></a>
-                                </li>
-                                <% } %>
-                                <% if (currentPage < totalPages) { %>
-                                <li>
-                                    <a href="/blogs?page=<%= currentPage + 1 %>&limit=10" class="size-[40px] inline-flex justify-center items-center text-slate-400 bg-white dark:bg-slate-900 rounded-e-3xl hover:text-white border border-gray-100 dark:border-gray-800 hover:border-red-500 dark:hover:border-red-500 hover:bg-red-500 dark:hover:bg-red-500">
-                                        <i data-feather="chevron-right" class="size-5 rtl:rotate-180 rtl:-mt-1"></i>
-                                    </a>
-                                </li>
-                                <% } %>
-                            </ul>
-                        </nav>
-                    </div><!--end col-->
+                <div class="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 mt-6 gap-6">
+                    <% relatedBlogs.forEach(function(relatedBlog) { %>
+                        <div class="group relative overflow-hidden">
+                            <div class="relative overflow-hidden rounded-md shadow-sm dark:shadow-gray-800">
+                                <img src="<%= relatedBlog.imageUrl %>" class="group-hover:scale-110 group-hover:rotate-3 duration-500 w-full md:w-[300px]" alt="related-Blogs" style="height: 300px; object-fit: cover;">
+                                <div class="absolute top-0 start-0 p-4 opacity-0 group-hover:opacity-100 duration-500">
+                                    <span
+                                        class="bg-red-500 text-white text-[12px] px-2.5 py-1 font-medium rounded-md h-5">Travel</span>
+                                </div>
+                            </div>
+
+                            <div class="mt-6">
+                                <a href="/blogdetails?id=<%= relatedBlog._id %>" class="text-lg font-medium hover:text-red-500 duration-500 ease-in-out"><%= relatedBlog.title %></a>
+                                <div class="flex mb-4 mt-2">
+                                    <span class="flex items-center text-slate-400 text-sm"><i data-feather="clock" class="size-4 text-slate-900 dark:text-white me-1.5"></i><%= relatedBlog.readTime %> min read</span>
+                                    <span class="text-slate-400 text-sm ms-3">by <a href="#" class="text-slate-900 dark:text-white hover:text-red-500 dark:hover:text-red-500 font-medium"><%= relatedBlog.author %></a></span>
+                                </div>
+                                <p class="text-slate-400 mt-2"><%= relatedBlog.metaDescription.split(' ').slice(0, 2).join(' ') %>...</p>
+
+                                <div class="mt-3">
+                                    <a href="/blogdetails?id=<%= relatedBlog._id %>" class="hover:text-red-500 inline-flex items-center">Read More <i data-feather="chevron-right" class="size-4 ms-1"></i></a>
+                                </div>
+                            </div>
+                        </div><!--end content-->
+                    <% }); %>
                 </div><!--end grid-->
             </div><!--end container-->
         </section><!--end section-->
@@ -437,14 +467,15 @@
             </div>
         </footer><!--end footer-->
         <!-- Footer End -->
+ 
 
         <!-- Back to top -->
         <a href="#" onclick="topFunction()" id="back-to-top" class="back-to-top fixed hidden text-lg rounded-md z-10 bottom-5 end-5 size-8 text-center bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white justify-center items-center"><i class="mdi mdi-arrow-up"></i></a>
         <!-- Back to top --> 
-
         <a href="https://wa.me/+918086602888" class="whatsapp-float" target="_blank">
             <img src="/images/whatsapp-gif.gif" alt="WhatsApp">
         </a>
+        
           <!-- mobile navbar -->
           <nav class="custom-nav__bottom-bar">
             <!-- Home -->
@@ -501,7 +532,6 @@
                 <span class="custom-nav__label">Contact</span>
             </a>
         </nav>
-
         <!-- JAVASCRIPTS -->
         <script src="/libs/feather-icons/feather.min.js"></script>
         <script src="/js/plugins.init.js"></script>

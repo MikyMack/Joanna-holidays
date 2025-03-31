@@ -331,5 +331,5 @@ try{
 }
 catch(err){}
 document.getElementById("packageLink").addEventListener("click", function() {
-    window.location.href = "packages.html";
+    window.location.href = "/packages";
 });
