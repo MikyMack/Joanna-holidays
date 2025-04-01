@@ -250,9 +250,14 @@ router.get('/package/:id', async (req, res) => {
             });
         }
 
+        const categories = await Category.find({ isActive: true })
+        .select('name imageUrl subCategories')
+        .lean();
+
         res.render('packageDetails', {
             title: package.title,
-            package
+            package,
+            categories
         });
     } catch (error) {
         console.error(error);
@@ -296,8 +301,8 @@ router.get('/package-details', async (req, res) => {
             });
         }
         const categories = await Category.find({ isActive: true })
-            .select('name imageUrl subCategories')
-            .lean();
+        .select('name imageUrl subCategories')
+        .lean();
 
         res.render('packageDetails', {
             title: package.title || subCategoryData.name,
