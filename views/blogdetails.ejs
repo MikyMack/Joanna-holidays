@@ -3,11 +3,11 @@
     
 <head>
         <meta charset="UTF-8">
-        <title>Joanna Holidays | BlogDetails</title>
+        <title>Joanna Holidays | <%= blog.title %></title>
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <meta content="Tour & Travels Agency Tailwind CSS Template" name="description">
-        <meta content="Tour, Travels, agency, business, corporate, tour packages, journey, trip, tailwind css, Admin, Landing" name="keywords">
-        <meta name="author" content="Shreethemes">
+        <meta content="<%= blog.metaDescription %>" name="description">
+        <meta content="<%= blog.metaKeywords.join(', ') %>" name="keywords">
+        <meta name="author" content="<%= blog.author %>">
         <meta name="website" content="https://shreethemes.in/">
         <meta name="email" content="support@shreethemes.in">
         <meta name="version" content="1.5.0">
