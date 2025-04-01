@@ -8,27 +8,33 @@ const deleteImageFromCloudinary = async (imageUrl) => {
     if (!imageUrl) return;
 
     try {
-        // Extract public ID from URL
-        const urlParts = imageUrl.split('/');
-        const uploadIndex = urlParts.indexOf('upload');
+        // More robust public ID extraction
+        const url = new URL(imageUrl);
+        const pathParts = url.pathname.split('/');
         
+        // Find the index after 'upload'
+        const uploadIndex = pathParts.indexOf('upload');
         if (uploadIndex === -1) {
-            throw new Error('Invalid Cloudinary URL');
+            console.warn('Invalid Cloudinary URL:', imageUrl);
+            return; // Just return instead of throwing error
         }
         
-        const publicIdWithVersion = urlParts.slice(uploadIndex + 1).join('/').split('.')[0];
+        // Get all parts after upload, remove file extension
+        const publicIdWithVersion = pathParts.slice(uploadIndex + 2).join('/');
         const publicId = publicIdWithVersion.replace(/^v\d+\//, '');
         
         const result = await cloudinary.uploader.destroy(publicId);
         
         if (result.result !== 'ok') {
-            throw new Error(`Failed to delete image: ${result.result}`);
+            console.warn(`Image not found in Cloudinary: ${publicId}`);
+            return; // Just return instead of throwing error
         }
         
         return result;
     } catch (error) {
         console.error('Error in deleteImageFromCloudinary:', error);
-        throw error; // Re-throw to be handled by the caller
+        // Don't throw error here - we want to continue deleting the category
+        // even if image deletion fails
     }
 };
 
@@ -101,18 +107,27 @@ exports.deleteCategory = async (req, res) => {
             return res.status(404).json({ message: 'Category not found' });
         }
 
-        // Delete category image
+        // Delete category image (don't await, and don't stop if it fails)
         if (category.imageUrl) {
-            await deleteImageFromCloudinary(category.imageUrl);
+            deleteImageFromCloudinary(category.imageUrl).catch(e => 
+                console.error('Failed to delete category image:', e)
+            );
         }
 
-        // Delete all subcategory images
-        for (const subcategory of category.subCategories) {
+        // Delete all subcategory images (same approach)
+        const subcategoryDeletions = category.subCategories.map(subcategory => {
             if (subcategory.imageUrl) {
-                await deleteImageFromCloudinary(subcategory.imageUrl);
+                return deleteImageFromCloudinary(subcategory.imageUrl).catch(e => 
+                    console.error('Failed to delete subcategory image:', e)
+                );
             }
-        }
+            return Promise.resolve();
+        });
 
+        // Wait for all image deletions to attempt (but don't fail if they do)
+        await Promise.allSettled(subcategoryDeletions);
+
+        // Delete the category regardless of image deletion results
         await Category.findByIdAndDelete(id);
         res.json({ message: 'Category deleted successfully' });
     } catch (error) {

@@ -145,7 +145,7 @@
                             <div class="bg-white dark:bg-slate-900 rounded-md shadow-sm dark:shadow-gray-800 p-6">
                                 <h3 class="mb-6 text-2xl leading-normal font-semibold">Get in touch !</h3>
 
-                                <form method="post" name="myForm" id="myForm" onsubmit="return validateForm()">
+                                <form method="post" name="myForm" id="myForm">
                                     <p class="mb-0" id="error-msg"></p>
                                     <div id="simple-msg"></div>
                                     <div class="grid lg:grid-cols-12 grid-cols-1 gap-3">
@@ -171,6 +171,60 @@
                                     </div>
                                     <button type="submit" id="submit" name="send" class="py-2 px-5 inline-block tracking-wide align-middle duration-500 text-base text-center bg-red-500 text-white rounded-md mt-2">Send Message</button>
                                 </form>
+
+                                <script>
+                                    document.getElementById('myForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const form = e.target;
+    const submitButton = form.querySelector('button[type="submit"]');
+    const errorMsg = document.getElementById('error-msg');
+    const simpleMsg = document.getElementById('simple-msg');
+    
+    // Show loading state
+    submitButton.disabled = true;
+    submitButton.innerHTML = 'Sending...';
+    errorMsg.textContent = '';
+    simpleMsg.textContent = '';
+    simpleMsg.className = '';
+    
+    try {
+        // Prepare form data
+        const formData = new URLSearchParams(new FormData(form));
+        
+        // Replace with your deployed web app URL
+        const scriptUrl = 'https://script.google.com/macros/s/AKfycbzkbGmZRuhsqVlkLF91gysZphGalUr8EniwitTi5euZtVPid0JVjX-owVNTivdBvY60/exec';
+        
+        const response = await fetch(scriptUrl, {
+            method: 'POST',
+            body: formData,
+            redirect: 'follow'
+        });
+        
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            // Show success message
+            simpleMsg.textContent = 'Thank you! Your message has been sent.';
+            simpleMsg.className = 'text-green-600 mt-2';
+            form.reset();
+        } else {
+            throw new Error(result.message || 'Submission failed');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        errorMsg.textContent = `Error: ${error.message}`;
+        errorMsg.className = 'text-red-600';
+    } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Send Message';
+    }
+});
+                                </script>
                             </div>
                         </div>
                     </div>
