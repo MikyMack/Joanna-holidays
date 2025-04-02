@@ -26,6 +26,8 @@
     <!-- Main Css -->
     <link href="/libs/%40mdi/font/css/materialdesignicons.min.css" rel="stylesheet" type="text/css">
     <link href="/css/tailwind.min.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/>
 
     <style>
         .package-item {
@@ -108,6 +110,47 @@
 
         .animate-fade-in {
             animation: fadeIn 0.3s ease-out;
+        }
+    </style>
+    <style>
+        .banner-slider {
+            margin: 0 auto;
+        }
+        .banner-slide {
+            padding: 0 10px;
+        }
+        .banner-image img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        /* Custom arrow styles */
+        .slick-prev, .slick-next {
+            width: 40px;
+            height: 40px;
+            z-index: 1;
+        }
+        .slick-prev {
+            left: 15px;
+        }
+        .slick-next {
+            right: 15px;
+        }
+        .slick-prev:before, .slick-next:before {
+            font-size: 40px;
+            color: #fff;
+            opacity: 0.7;
+        }
+        .slick-prev:hover:before, .slick-next:hover:before {
+            opacity: 1;
+        }
+        /* Dots styling */
+        .slick-dots {
+            bottom: 20px;
+        }
+        .slick-dots li button:before {
+            font-size: 12px;
+            color: #fff;
         }
     </style>
 </head>
@@ -418,18 +461,7 @@
                 </div><!--end slider-->
             </div>
         </div><!--end container-->
-        <% if (banner) { %>
-            <div class="container mt-16">
-                <div class="grid grid-cols-1">
-                    <div class="relative">
-                        <a href="/contact" class="cursor-pointer">
-                            <img src="<%= banner.imageUrl %>" class="w-full h-auto rounded-lg shadow-md"
-                                alt="<%= banner.title %>">
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <% } %>
+       
 
                 <div class="container relative md:mt-16 mt-16">
                     <div class="grid grid-cols-1 pb-8 text-center">
@@ -528,8 +560,72 @@
                         </a>
                     </div>
                 </div>
+                <% if (banners && banners.length > 0) { %>
+      
+                    <div class="container mt-16">
+                        <div class="banner-slider">
+                            <% banners.forEach((banner) => { %>
+                                <% banner.images.forEach((image) => { %>
+                                    <div class="banner-slide">
+                                        <div class="banner-image">
+                                            <img src="<%= image.url %>" class="w-full h-auto rounded-lg shadow-md" alt="<%= banner.title %>">
+                                        </div>
+                                    </div>
+                                <% }) %>
+                            <% }) %>
+                        </div>
+                    </div>
+                <% } %>
+                <div class="container relative md:mt-24 mt-16">
+                    <div class="grid grid-cols-1 pb-6 text-center">
+                        <h3 class="mb-6 md:text-3xl text-2xl md:leading-normal leading-normal font-semibold">Hear From
+                            Our Happy
+                            Travelers 🌍✈️</h3>
 
+                        <p class="text-slate-400 max-w-xl mx-auto">Discover what our happy travelers have to say about
+                            their
+                            unforgettable journeys with us!</p>
+                    </div><!--end grid-->
 
+                    <div class="grid grid-cols-1 mt-6">
+                        <div class="tiny-three-item">
+                            <% testimonials.forEach(testimonial=> { %>
+                                <div class="tiny-slide text-center">
+                                    <div class="cursor-e-resize testi">
+                                        <div
+                                            class="content relative rounded shadow-sm dark:shadow-gray-700 m-2 p-6 bg-white dark:bg-slate-900 before:content-[''] before:absolute before:start-1/2 before:-bottom-[4px] before:box-border before:border-8 before:rotate-[45deg] before:border-t-transparent before:border-e-white dark:before:border-e-slate-900 before:border-b-white dark:before:border-b-slate-900 before:border-s-transparent before:shadow-testi dark:before:shadow-gray-700 before:origin-top-left">
+                                            <div class="flex justify-center items-center">
+                                                <img class="testi-logo h-10" src="/images/google-logo.png" alt="">
+                                            </div>
+
+                                            <p class="text-slate-400 line-clamp-3">"<%= testimonial.content %>"</p>
+                                            <ul class="list-none mb-0 text-amber-400 mt-3">
+                                                <% for (let i=0; i < testimonial.rating; i++) { %>
+                                                    <li class="inline"><i class="mdi mdi-star"></i></li>
+                                                    <% } %>
+                                                        <% for (let i=testimonial.rating; i < 5; i++) { %>
+                                                            <li class="inline"><i class="mdi mdi-star-outline"></i></li>
+                                                            <% } %>
+                                            </ul>
+                                        </div>
+
+                                        <div class="text-center mt-5">
+                                            <img src="<%= testimonial.imageUrl %>"
+                                                class="size-14 rounded-full shadow-md dark:shadow-gray-700 mx-auto"
+                                                alt="profile pic" style="width: 40px; object-fit: cover;">
+                                            <h6 class="mt-2 font-semibold">
+                                                <%= testimonial.name %>
+                                            </h6>
+                                            <p class="text-slate-400">
+                                                <%= testimonial.designation %>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <% }); %>
+                        </div>
+                    </div><!--end grid-->
+                </div><!--end container-->
                 <div class="container relative md:mt-24 mt-16">
                     <div class="grid md:grid-cols-12 grid-cols-1 items-center gap-6 relative">
                         <div class="md:col-span-5">
@@ -595,56 +691,7 @@
                         </div>
                     </div>
                 </div><!--end container-->
-                <div class="container relative md:mt-24 mt-16">
-                    <div class="grid grid-cols-1 pb-6 text-center">
-                        <h3 class="mb-6 md:text-3xl text-2xl md:leading-normal leading-normal font-semibold">Hear From
-                            Our Happy
-                            Travelers 🌍✈️</h3>
-
-                        <p class="text-slate-400 max-w-xl mx-auto">Discover what our happy travelers have to say about
-                            their
-                            unforgettable journeys with us!</p>
-                    </div><!--end grid-->
-
-                    <div class="grid grid-cols-1 mt-6">
-                        <div class="tiny-three-item">
-                            <% testimonials.forEach(testimonial=> { %>
-                                <div class="tiny-slide text-center">
-                                    <div class="cursor-e-resize testi">
-                                        <div
-                                            class="content relative rounded shadow-sm dark:shadow-gray-700 m-2 p-6 bg-white dark:bg-slate-900 before:content-[''] before:absolute before:start-1/2 before:-bottom-[4px] before:box-border before:border-8 before:rotate-[45deg] before:border-t-transparent before:border-e-white dark:before:border-e-slate-900 before:border-b-white dark:before:border-b-slate-900 before:border-s-transparent before:shadow-testi dark:before:shadow-gray-700 before:origin-top-left">
-                                            <div class="flex justify-center items-center">
-                                                <img class="testi-logo h-10" src="/images/google-logo.png" alt="">
-                                            </div>
-
-                                            <p class="text-slate-400 line-clamp-3">"<%= testimonial.content %>"</p>
-                                            <ul class="list-none mb-0 text-amber-400 mt-3">
-                                                <% for (let i=0; i < testimonial.rating; i++) { %>
-                                                    <li class="inline"><i class="mdi mdi-star"></i></li>
-                                                    <% } %>
-                                                        <% for (let i=testimonial.rating; i < 5; i++) { %>
-                                                            <li class="inline"><i class="mdi mdi-star-outline"></i></li>
-                                                            <% } %>
-                                            </ul>
-                                        </div>
-
-                                        <div class="text-center mt-5">
-                                            <img src="<%= testimonial.imageUrl %>"
-                                                class="size-14 rounded-full shadow-md dark:shadow-gray-700 mx-auto"
-                                                alt="profile pic" style="width: 40px; object-fit: cover;">
-                                            <h6 class="mt-2 font-semibold">
-                                                <%= testimonial.name %>
-                                            </h6>
-                                            <p class="text-slate-400">
-                                                <%= testimonial.designation %>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <% }); %>
-                        </div>
-                    </div><!--end grid-->
-                </div><!--end container-->
+               
                 <div class="container relative md:mt-24 mt-16">
                     <div class="grid grid-cols-1 pb-6 text-center">
                         <h3 class="mb-6 md:text-3xl text-2xl md:leading-normal leading-normal font-semibold">Travel
@@ -1042,7 +1089,22 @@
                                     });
                                 </script>
 
-
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        $('.banner-slider').slick({
+            dots: true,
+            infinite: true,
+            speed: 500,
+            slidesToShow: 1,
+            slidesToScroll: 1,
+            autoplay: true,
+            autoplaySpeed: 3000,
+            arrows: true,
+            pauseOnHover: true,
+            adaptiveHeight: true
+        });
+    });
+</script>
                                 <!-- JAVASCRIPTS -->
                                 <script src="/libs/tobii/js/tobii.min.js"></script>
                                 <script src="/libs/tiny-slider/min/tiny-slider.js"></script>
@@ -1051,6 +1113,9 @@
                                 <script src="/libs/feather-icons/feather.min.js"></script>
                                 <script src="/js/plugins.init.js"></script>
                                 <script src="/js/app.js"></script>
+                                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                                <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+                            
                                 <!-- JAVASCRIPTS -->
 </body>
 

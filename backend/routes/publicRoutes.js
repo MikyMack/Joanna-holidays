@@ -10,11 +10,8 @@ const Testimonial = require('../models/Testimonial');
 
 router.get('/', async (req, res) => {
     try {
-        // Fetch active banner data
-        const banner = await Banner.findOne({ isActive: true })
-            .select('title description imageUrl')
-            .lean();
-
+        // Fetch active banners data
+        const banners = await Banner.find({ isActive: true }).sort({ createdAt: -1 });
         // Fetch categories
         const categories = await Category.find({ isActive: true })
             .select('name imageUrl subCategories')
@@ -60,7 +57,7 @@ router.get('/', async (req, res) => {
 
         res.render('index', { 
             title: 'Home Page',
-            banner: banner,
+            banners: banners,
             categories: categoryMap,
             packages: processedPackages,
             featuredPackages: processedPackages.slice(0, 3),

@@ -8,33 +8,32 @@ const deleteImageFromCloudinary = async (imageUrl) => {
     if (!imageUrl) return;
 
     try {
-        // More robust public ID extraction
         const url = new URL(imageUrl);
         const pathParts = url.pathname.split('/');
         
-        // Find the index after 'upload'
         const uploadIndex = pathParts.indexOf('upload');
         if (uploadIndex === -1) {
             console.warn('Invalid Cloudinary URL:', imageUrl);
-            return; // Just return instead of throwing error
+            return;
         }
         
-        // Get all parts after upload, remove file extension
-        const publicIdWithVersion = pathParts.slice(uploadIndex + 2).join('/');
-        const publicId = publicIdWithVersion.replace(/^v\d+\//, '');
+        // Get all parts after 'upload' (should be: [version, folder, filename])
+        const partsAfterUpload = pathParts.slice(uploadIndex + 1);
+        
+        // The public ID is everything after 'upload' except the version prefix
+        // Join with '/' and remove file extension
+        const publicId = partsAfterUpload.slice(1).join('/').replace(/\.[^/.]+$/, '');
         
         const result = await cloudinary.uploader.destroy(publicId);
         
         if (result.result !== 'ok') {
             console.warn(`Image not found in Cloudinary: ${publicId}`);
-            return; // Just return instead of throwing error
+            return;
         }
         
         return result;
     } catch (error) {
         console.error('Error in deleteImageFromCloudinary:', error);
-        // Don't throw error here - we want to continue deleting the category
-        // even if image deletion fails
     }
 };
 

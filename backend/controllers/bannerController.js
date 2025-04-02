@@ -3,19 +3,26 @@ const cloudinary = require('../utils/cloudinary');
 
 exports.createBanner = async (req, res) => {
     try {
-        // Verify file was uploaded
-        if (!req.file) {
+        // Verify files were uploaded
+        if (!req.files || req.files.length === 0) {
             return res.status(400).json({
                 success: false,
-                message: 'Image file is required'
+                message: 'At least one image file is required'
             });
         }
+
+        // Upload images to Cloudinary
+        const imageUploadPromises = req.files.map(file => cloudinary.uploader.upload(file.path, {
+            folder: 'banners',
+            quality: 'auto:good'
+        }));
+
+        const uploadResults = await Promise.all(imageUploadPromises);
 
         // Create banner object
         const banner = new Banner({
             title: req.body.title,
-            description: req.body.description,
-            imageUrl: req.file.path,
+            images: uploadResults.map(result => ({ url: result.secure_url })),
             isActive: req.body.isActive === 'true'
         });
 
@@ -57,7 +64,7 @@ exports.getBannerById = async (req, res) => {
 
 exports.updateBanner = async (req, res) => {
     try {
-        const { title, description } = req.body;
+        const { title } = req.body;
         const banner = await Banner.findById(req.params.id);
         
         if (!banner) {
@@ -67,29 +74,28 @@ exports.updateBanner = async (req, res) => {
             });
         }
 
-        // Handle image update if new file provided
-        if (req.file) {
+        // Handle image update if new files provided
+        if (req.files && req.files.length > 0) {
             try {
-                // Delete old image from Cloudinary if exists
-                if (banner.cloudinary_id) {
-                    await cloudinary.uploader.destroy(banner.cloudinary_id)
-                        .catch(err => console.error('Cloudinary deletion error:', err));
-                }
+                // Delete old images from Cloudinary
+                const deletePromises = banner.images.map(image => cloudinary.uploader.destroy(image.cloudinary_id));
+                await Promise.all(deletePromises);
 
-                // Upload new image
-                const result = await cloudinary.uploader.upload(req.file.path, {
+                // Upload new images
+                const imageUploadPromises = req.files.map(file => cloudinary.uploader.upload(file.path, {
                     folder: 'banners',
                     quality: 'auto:good'
-                });
+                }));
 
-                banner.imageUrl = result.secure_url;
-                banner.cloudinary_id = result.public_id;
+                const uploadResults = await Promise.all(imageUploadPromises);
+
+                banner.images = uploadResults.map(result => ({ url: result.secure_url, cloudinary_id: result.public_id }));
 
             } catch (uploadError) {
                 console.error('Image upload error:', uploadError);
                 return res.status(500).json({
                     success: false,
-                    message: "Error uploading image",
+                    message: "Error uploading images",
                     error: uploadError.message
                 });
             }
@@ -97,7 +103,6 @@ exports.updateBanner = async (req, res) => {
 
         // Update other fields
         banner.title = title || banner.title;
-        banner.description = description || banner.description;
         
         await banner.save();
         
@@ -127,10 +132,20 @@ exports.deleteBanner = async (req, res) => {
             });
         }
 
-        // Delete from Cloudinary only if cloudinary_id exists
-        if (banner.cloudinary_id) {
-            await cloudinary.uploader.destroy(banner.cloudinary_id)
-                .catch(err => console.error('Cloudinary deletion error:', err));
+        // Attempt to delete images from Cloudinary
+        try {
+            const deletePromises = banner.images.map(image => {
+                const publicId = image.url.split('/').slice(-1)[0].split('.')[0]; // Extract public_id from URL
+                return cloudinary.uploader.destroy(`banners/${publicId}`);
+            });
+            await Promise.all(deletePromises);
+        } catch (cloudinaryError) {
+            console.error('Cloudinary deletion error:', cloudinaryError);
+            return res.status(500).json({
+                success: false,
+                message: "Error deleting images from Cloudinary",
+                error: cloudinaryError.message
+            });
         }
 
         // Delete from database

@@ -44,10 +44,10 @@ router.put('/admin-blogs/:id', upload.single('image'), blogController.updateBlog
 router.delete('/admin-blogs/:id', blogController.deleteBlog);
 
 // 🎭 Banners Routes
-router.post('/banners', upload.single('image'), bannerController.createBanner);
+router.post('/banners', upload.array('images', 5), bannerController.createBanner);
 router.get('/banners', bannerController.getAllBanners);
 router.get('/banners/:id', bannerController.getBannerById);
-router.put('/banners/:id', upload.single('image'), bannerController.updateBanner);
+router.put('/banners/:id', upload.array('images', 5), bannerController.updateBanner);
 router.delete('/banners/:id', bannerController.deleteBanner);
 router.patch('/banners/:id/status', bannerController.updateBannerStatus);
 

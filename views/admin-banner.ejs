@@ -413,25 +413,19 @@
                                         <form id="addBannerForm" enctype="multipart/form-data">
                                             <div class="form-group">
                                                 <label for="bannerTitle">Title*</label>
-                                                <input type="text" id="bannerTitle" name="title" required
-                                                    class="w-full">
+                                                <input type="text" id="bannerTitle" name="title" required class="w-full">
                                             </div>
                                             <div class="form-group">
-                                                <label for="bannerDescription">Description*</label>
-                                                <textarea id="bannerDescription" name="description" required
-                                                    class="w-full" rows="3"></textarea>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="bannerImage">Image*</label>
-                                                <input type="file" id="bannerImage" name="image" accept="image/*"
-                                                    required>
-                                                <div class="text-tiny text-gray-500 mt-1">Only JPEG, JPG, PNG, WEBP
-                                                    allowed (Max 5MB) height: 634 px width: 1352 px</div>
+                                                <label for="bannerImages">Images (1-5 required)</label>
+                                                <input type="file" id="bannerImages" name="images" accept="image/*" multiple required>
+                                                <div class="text-tiny text-gray-500 mt-1">
+                                                    Only JPEG, JPG, PNG, WEBP allowed (Max 5MB each), height: 634px width: 1352px
+                                                </div>
+                                                <div id="imagePreviews" class="mt-2 grid grid-cols-3 gap-2"></div>
                                             </div>
                                             <div class="form-group">
                                                 <label class="flex items-center">
-                                                    <input type="checkbox" id="bannerIsActive" name="isActive"
-                                                        class="mr-2" checked>
+                                                    <input type="checkbox" id="bannerIsActive" name="isActive" class="mr-2" checked>
                                                     <span>Active Banner</span>
                                                 </label>
                                             </div>
@@ -450,20 +444,16 @@
                                             <input type="hidden" id="editBannerId">
                                             <div class="form-group">
                                                 <label for="editBannerTitle">Title*</label>
-                                                <input type="text" id="editBannerTitle" name="title" required
-                                                    class="w-full">
+                                                <input type="text" id="editBannerTitle" name="title" required class="w-full">
                                             </div>
                                             <div class="form-group">
-                                                <label for="editBannerDescription">Description*</label>
-                                                <textarea id="editBannerDescription" name="description" required
-                                                    class="w-full" rows="3"></textarea>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="editBannerImage">Image</label>
-                                                <input type="file" id="editBannerImage" name="image" accept="image/*">
-                                                <div class="text-tiny text-gray-500 mt-1">Leave empty to keep current
-                                                    image , height: 634 px width: 1352 px</div>
-                                                <div id="currentBannerImagePreview" class="mt-2"></div>
+                                                <label for="editBannerImages">Update Images</label>
+                                                <input type="file" id="editBannerImages" name="images" accept="image/*" multiple>
+                                                <div class="text-tiny text-gray-500 mt-1">
+                                                    Select new images to replace all current ones (1-5 images), height: 634px width: 1352px
+                                                </div>
+                                                <div id="currentBannerImagesPreview" class="mt-2 grid grid-cols-3 gap-2"></div>
+                                                <div id="newBannerImagesPreview" class="mt-2 grid grid-cols-3 gap-2"></div>
                                             </div>
                                             <button type="submit" class="tf-button style-1">Update Banner</button>
                                         </form>
@@ -493,20 +483,42 @@
     <script>
         // Global variables
         let banners = [];
-
+    
         // DOM Ready
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             fetchBanners();
             setupFormHandlers();
+            
+            // Add image preview for add banner
+            document.getElementById('bannerImages').addEventListener('change', function(e) {
+                const previewContainer = document.getElementById('imagePreviews');
+                previewContainer.innerHTML = '';
+                
+                if (this.files.length > 5) {
+                    alert('Maximum 5 images allowed');
+                    this.value = '';
+                    return;
+                }
+                
+                Array.from(this.files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'w-full h-24 object-cover rounded';
+                        previewContainer.appendChild(img);
+                    }
+                    reader.readAsDataURL(file);
+                });
+            });
         });
-
+    
         // Fetch all banners
-        // Add this to your fetchBanners function
         async function fetchBanners() {
             try {
                 const response = await fetch('/banners');
                 if (!response.ok) throw new Error('Failed to fetch banners');
-
+    
                 const data = await response.json();
                 banners = data;
                 renderBanners();
@@ -514,93 +526,125 @@
                 alert('Error loading banners');
             }
         }
-
-        // Render banners to the table
-        // Render banners to the table
+    
         // Render banners to the table
         function renderBanners() {
             const bannerList = document.getElementById('banner-list');
             bannerList.innerHTML = '';
-
+    
             banners.forEach(banner => {
                 if (!banner) return;
-
+    
                 const bannerItem = document.createElement('li');
                 bannerItem.className = 'flex items-center py-3 px-4 border-b border-gray-200 hover:bg-gray-50';
+                
+                // Create image preview for all images
+                let imagesHTML = '';
+                if (banner.images && banner.images.length > 0) {
+                    imagesHTML = banner.images.map(image => `
+                        <div class="inline-block mr-1">
+                            <img src="${image.url}" 
+                                 class=" object-cover rounded-md shadow-sm"
+                                 alt="${banner.title || ''}" style="width:150px; margin-right:5px;">
+                        </div>
+                    `).join('');
+                }
+    
                 bannerItem.innerHTML = `
-            <!-- Image Column -->
-            <div class="w-1/6 min-w-[100px]">
-                <img src="${banner.imageUrl || ''}" alt="${banner.title || ''}" 
-                     class=" object-cover rounded-md shadow-sm"  style="width: 120px;">
-            </div>
-            
-            <!-- Title Column -->
-            <div class="w-2/6 px-4">
-               
-               <div class="font-medium text-gray-900 truncate">${banner.title || 'No title'}</div>
-            </div>
-            <div class="w-3/6 px-4">
-               
-                <div class="text-sm text-gray-500 truncate">
-                    ${banner.description ?
-                        banner.description.split(' ').slice(0, 8).join(' ') +
-                        (banner.description.split(' ').length > 8 ? '...' : '')
-                        : 'No description'}
-                </div>
-            </div>
-            
-            <!-- Status Column with Toggle Switch -->
-            <div class="w-1/6 flex justify-center tf-button style-3">
-                <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" ${banner.isActive ? 'checked' : ''} 
-                           class="sr-only peer" 
-                           onchange="toggleBannerStatus('${banner._id}', this.checked)">
-                    <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-2 peer-focus:ring-blue-300 peer-checked:bg-blue-600">
-                        <div class="absolute top-[2px] left-[2px] bg-white border border-gray-300 rounded-full h-5 w-5 transition-all peer-checked:translate-x-5 peer-checked:border-white"></div>
+                    <!-- Image Column -->
+                    <div class="w-1/6 min-w-[100px] flex flex-wrap">
+                        ${imagesHTML}
                     </div>
-                    <span class="ml-2 text-sm font-medium text-gray-700">
-                        ${banner.isActive ? 'Active' : 'Inactive'}
-                    </span>
-                </label>
-            </div>
-            
-            <!-- Actions Column -->
-              <div class="flex gap10">
-                <button class="tf-button style-3" onclick="showEditBannerModal('${banner._id}')">
-                    <i class="icon-edit"></i> Edit
-                </button>
-                <button class="tf-button style-3" onclick="confirmDeleteBanner('${banner._id}')">
-                    <i class="icon-trash-2"></i> Delete
-                </button>
-            </div>
-        `;
+                    
+                    <!-- Title Column -->
+                    <div class="w-2/6 px-4">
+                        <div class="font-medium text-gray-900 truncate">${banner.title || 'No title'}</div>
+                    </div>
+                    
+                    <!-- Status Column with Toggle Switch -->
+                    <div class="w-1/6 flex justify-center tf-button style-3">
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" ${banner.isActive ? 'checked' : ''} 
+                                   class="sr-only peer" 
+                                   onchange="toggleBannerStatus('${banner._id}', this.checked)">
+                            <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-2 peer-focus:ring-blue-300 peer-checked:bg-blue-600">
+                                <div class="absolute top-[2px] left-[2px] bg-white border border-gray-300 rounded-full h-5 w-5 transition-all peer-checked:translate-x-5 peer-checked:border-white"></div>
+                            </div>
+                            <span class="ml-2 text-sm font-medium text-gray-700">
+                                ${banner.isActive ? 'Active' : 'Inactive'}
+                            </span>
+                        </label>
+                    </div>
+                    
+                    <!-- Actions Column -->
+                    <div class="flex gap10">
+                        <button class="tf-button style-3" onclick="showEditBannerModal('${banner._id}')">
+                            <i class="icon-edit"></i> Edit
+                        </button>
+                        <button class="tf-button style-3" onclick="confirmDeleteBanner('${banner._id}')">
+                            <i class="icon-trash-2"></i> Delete
+                        </button>
+                    </div>
+                `;
                 bannerList.appendChild(bannerItem);
             });
         }
+    
         // Show Add Banner Modal
         function showAddBannerModal() {
             document.getElementById('addBannerForm').reset();
+            document.getElementById('imagePreviews').innerHTML = '';
             document.getElementById('addBannerModal').style.display = 'block';
         }
-
+    
         // Show Edit Banner Modal
         async function showEditBannerModal(id) {
             const banner = banners.find(b => b._id === id);
             if (!banner) return;
-
+    
             document.getElementById('editBannerId').value = banner._id;
             document.getElementById('editBannerTitle').value = banner.title;
-            document.getElementById('editBannerDescription').value = banner.description;
-
-            const preview = document.getElementById('currentBannerImagePreview');
-            preview.innerHTML = `
-        <p class="text-tiny">Current Image:</p>
-        <img src="${banner.imageUrl}" alt="${banner.title}" class="w-full h-32 object-contain mt-1">
-    `;
-
+    
+            const preview = document.getElementById('currentBannerImagesPreview');
+            preview.innerHTML = '<p class="col-span-3 text-tiny">Current Images:</p>';
+            
+            banner.images.forEach(imageUrl => {
+                preview.innerHTML += `
+                    <img src="${imageUrl}" class="w-full h-24 object-cover rounded">
+                `;
+            });
+    
+            // Clear any previous new image selections
+            document.getElementById('editBannerImages').value = '';
+            document.getElementById('newBannerImagesPreview').innerHTML = '';
+            
+            // Add new image preview functionality
+            document.getElementById('editBannerImages').addEventListener('change', function(e) {
+                const previewContainer = document.getElementById('newBannerImagesPreview');
+                previewContainer.innerHTML = '<p class="col-span-3 text-tiny">New Images:</p>';
+                
+                if (this.files.length > 5) {
+                    alert('Maximum 5 images allowed');
+                    this.value = '';
+                    return;
+                }
+                
+                Array.from(this.files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.className = 'w-full h-24 object-cover rounded';
+                        previewContainer.appendChild(img);
+                    }
+                    reader.readAsDataURL(file);
+                });
+            });
+    
             document.getElementById('editBannerModal').style.display = 'block';
         }
-
+    
+        // Toggle banner status
         async function toggleBannerStatus(id, isActive) {
             try {
                 const response = await fetch(`/banners/${id}/status`, {
@@ -610,12 +654,12 @@
                     },
                     body: JSON.stringify({ isActive })
                 });
-
+    
                 if (!response.ok) {
                     const errorData = await response.json();
                     throw new Error(errorData.message || 'Failed to update banner status');
                 }
-
+    
                 // Update local state
                 const index = banners.findIndex(b => b._id === id);
                 if (index !== -1) {
@@ -629,31 +673,41 @@
                 renderBanners();
             }
         }
+    
         // Close any modal
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
         }
-
+    
         // Setup form handlers
         function setupFormHandlers() {
             // Add Banner Form
-            document.getElementById('addBannerForm').addEventListener('submit', async function (e) {
+            document.getElementById('addBannerForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
-
+    
+                const files = document.getElementById('bannerImages').files;
+                if (files.length < 1 || files.length > 5) {
+                    alert('Please select between 1 and 5 images');
+                    return;
+                }
+    
                 const formData = new FormData();
                 formData.append('title', document.getElementById('bannerTitle').value);
-                formData.append('description', document.getElementById('bannerDescription').value);
-                formData.append('image', document.getElementById('bannerImage').files[0]);
                 formData.append('isActive', document.getElementById('bannerIsActive').checked);
-
+                
+                // Append all selected files
+                Array.from(files).forEach(file => {
+                    formData.append('images', file);
+                });
+    
                 try {
                     const response = await fetch('/banners', {
                         method: 'POST',
                         body: formData
                     });
-
+    
                     if (!response.ok) throw new Error('Failed to add banner');
-
+    
                     const newBanner = await response.json();
                     banners.unshift(newBanner);
                     renderBanners();
@@ -664,29 +718,37 @@
                     alert('Error adding banner');
                 }
             });
-
+    
             // Edit Banner Form
-            document.getElementById('editBannerForm').addEventListener('submit', async function (e) {
+            document.getElementById('editBannerForm').addEventListener('submit', async function(e) {
                 e.preventDefault();
-
+    
                 const id = document.getElementById('editBannerId').value;
+                const files = document.getElementById('editBannerImages').files;
+                
+                if (files.length > 5) {
+                    alert('Maximum 5 images allowed');
+                    return;
+                }
+    
                 const formData = new FormData();
                 formData.append('title', document.getElementById('editBannerTitle').value);
-                formData.append('description', document.getElementById('editBannerDescription').value);
-
-                const imageFile = document.getElementById('editBannerImage').files[0];
-                if (imageFile) {
-                    formData.append('image', imageFile);
+                
+                // Append new images if any were selected
+                if (files.length > 0) {
+                    Array.from(files).forEach(file => {
+                        formData.append('images', file);
+                    });
                 }
-
+    
                 try {
                     const response = await fetch(`/banners/${id}`, {
                         method: 'PUT',
                         body: formData
                     });
-
+    
                     if (!response.ok) throw new Error('Failed to update banner');
-
+    
                     const updatedBanner = await response.json();
                     const index = banners.findIndex(b => b._id === id);
                     if (index !== -1) {
@@ -695,25 +757,24 @@
                     renderBanners();
                     closeModal('editBannerModal');
                     alert('Banner updated successfully');
-                    location.reload();
                 } catch (error) {
                     console.error('Error:', error);
                     alert('Error updating banner');
                 }
             });
         }
-
+    
         // Confirm and delete banner
         async function confirmDeleteBanner(id) {
             if (!confirm('Are you sure you want to delete this banner?')) return;
-
+    
             try {
                 const response = await fetch(`/banners/${id}`, {
                     method: 'DELETE'
                 });
-
+    
                 if (!response.ok) throw new Error('Failed to delete banner');
-
+    
                 banners = banners.filter(banner => banner._id !== id);
                 renderBanners();
                 alert('Banner deleted successfully');
