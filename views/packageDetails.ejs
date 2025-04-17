@@ -709,69 +709,69 @@
                         <div id="message" class="mt-4 hidden p-4 rounded"></div>
 
                         <script>
-                          document.getElementById('bookingForm').addEventListener('submit', async function(e) {
-    e.preventDefault();
+                            document.getElementById('bookingForm').addEventListener('submit', async function (e) {
+                                e.preventDefault();
 
-    const form = e.target;
-    const submitButton = form.querySelector('button[type="submit"]');
-    const submitText = document.getElementById('submitText');
-    const spinner = document.getElementById('spinner');
-    const successMessage = document.getElementById('successMessage');
-    const errorMessage = document.getElementById('errorMessage');
+                                const form = e.target;
+                                const submitButton = form.querySelector('button[type="submit"]');
+                                const submitText = document.getElementById('submitText');
+                                const spinner = document.getElementById('spinner');
+                                const successMessage = document.getElementById('successMessage');
+                                const errorMessage = document.getElementById('errorMessage');
 
-    // Reset messages
-    successMessage.classList.add('hidden');
-    errorMessage.classList.add('hidden');
-    
-    // Show loading state
-    submitText.textContent = 'Processing...';
-    spinner.classList.remove('hidden');
-    submitButton.disabled = true;
+                                // Reset messages
+                                successMessage.classList.add('hidden');
+                                errorMessage.classList.add('hidden');
 
-    try {
-        // Prepare form data
-        const formData = new URLSearchParams();
-        for (const pair of new FormData(form)) {
-            formData.append(pair[0], pair[1]);
-        }
+                                // Show loading state
+                                submitText.textContent = 'Processing...';
+                                spinner.classList.remove('hidden');
+                                submitButton.disabled = true;
 
-        // Replace with your deployed web app URL
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbxHm21LuaBSkIRTqRdYzA0Tm5DJp5W4d098iL0aJ1YAfCVVoOqXeC6e2yFu3LPn4Q9t/exec';
+                                try {
+                                    // Prepare form data
+                                    const formData = new URLSearchParams();
+                                    for (const pair of new FormData(form)) {
+                                        formData.append(pair[0], pair[1]);
+                                    }
 
-        const response = await fetch(scriptUrl, {
-            method: 'POST',
-            body: formData,
-            redirect: 'follow'
-        });
+                                    // Replace with your deployed web app URL
+                                    const scriptUrl = 'https://script.google.com/macros/s/AKfycbxwW0I65KndHHnrq16qrLIJryEFhLZU-5rMbhqvqzaBqMfEvvVrI5ghGl3tkVQJ0BNldQ/exec';
 
-        // First check if response is OK
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+                                    const response = await fetch(scriptUrl, {
+                                        method: 'POST',
+                                        body: formData,
+                                        redirect: 'follow'
+                                    });
 
-        // Then parse the JSON
-        const result = await response.json();
-        
-        // Check the actual result content
-        if (result.status === 'success') {
-            successMessage.classList.remove('hidden');
-            form.reset();
-        } else {
-            throw new Error(result.message || 'Unknown error from server');
-        }
-    } catch (error) {
-        console.error('Submission error:', error);
-        errorMessage.textContent = error.message;
-        errorMessage.classList.remove('hidden');
-        
-        // Log the full error for debugging
-        console.log('Full error object:', error);
-    } finally {
-        submitText.textContent = 'Book Now';
-        spinner.classList.add('hidden');
-        submitButton.disabled = false;
-    }
-});
+                                    // First check if response is OK
+                                    if (!response.ok) {
+                                        throw new Error(`HTTP error! status: ${response.status}`);
+                                    }
+
+                                    // Then parse the JSON
+                                    const result = await response.json();
+
+                                    // Check the actual result content
+                                    if (result.status === 'success') {
+                                        successMessage.classList.remove('hidden');
+                                        form.reset();
+                                    } else {
+                                        throw new Error(result.message || 'Unknown error from server');
+                                    }
+                                } catch (error) {
+                                    console.error('Submission error:', error);
+                                    errorMessage.textContent = error.message;
+                                    errorMessage.classList.remove('hidden');
+
+                                    // Log the full error for debugging
+                                    console.log('Full error object:', error);
+                                } finally {
+                                    submitText.textContent = 'Book Now';
+                                    spinner.classList.add('hidden');
+                                    submitButton.disabled = false;
+                                }
+                            });
                         </script>
 
                         <div id="successMessage" class="hidden mt-4 p-4 bg-green-100 text-green-700 rounded">
