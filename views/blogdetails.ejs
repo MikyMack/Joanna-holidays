@@ -326,30 +326,26 @@
                                     </a>
                                     <p class="mt-6 text-gray-300">Planning for a trip? We will organize your trip with the
                                         best places and within best budget!</p>
-                                    <ul class="list-none mt-6">
-    
-    
-    
-                                        <li class="inline"><a href="https://www.facebook.com/joannaholidays1/"
-                                                target="_blank"
-                                                class="size-8 inline-flex items-center justify-center tracking-wide align-middle text-base border border-gray-800 dark:border-gray-700 rounded-md hover:bg-red-500 hover:text-white text-slate-300"><i
-                                                    data-feather="facebook" class="size-4 align-middle"
-                                                    title="facebook"></i></a></li>
-                                        <li class="inline"><a href="https://www.instagram.com/joannaholidays/?hl=en"
-                                                target="_blank"
-                                                class="size-8 inline-flex items-center justify-center tracking-wide align-middle text-base border border-gray-800 dark:border-gray-700 rounded-md hover:bg-red-500 hover:text-white text-slate-300"><i
-                                                    data-feather="instagram" class="size-4 align-middle"
-                                                    title="instagram"></i></a></li>
-                                        <li class="inline"><a href="#" target="_blank"
-                                                class="size-8 inline-flex items-center justify-center tracking-wide align-middle text-base border border-gray-800 dark:border-gray-700 rounded-md hover:bg-red-500 hover:text-white text-slate-300"><i
-                                                    data-feather="twitter" class="size-4 align-middle"
-                                                    title="twitter"></i></a></li>
-                                        <li class="inline"><a href="mailto:
-                                                admin@joannaholidays.com"
-                                                class="size-8 inline-flex items-center justify-center tracking-wide align-middle text-base border border-gray-800 dark:border-gray-700 rounded-md hover:bg-red-500 hover:text-white text-slate-300"><i
-                                                    data-feather="mail" class="size-4 align-middle" title="email"></i></a>
-                                        </li>
-                                    </ul><!--end icon-->
+                                        <ul class="list-none mt-6">
+                                            <li class="inline"><a href="https://www.facebook.com/joannaholidays1/"
+                                                    target="_blank"
+                                                    class="size-8 inline-flex items-center justify-center tracking-wide align-middle text-base border border-gray-800 dark:border-gray-700 rounded-md hover:bg-red-500 hover:text-white text-slate-300"><i
+                                                        data-feather="facebook" class="size-4 align-middle"
+                                                        title="facebook"></i></a></li>
+                                            <li class="inline"><a href="https://www.instagram.com/joannaholidays/?hl=en"
+                                                    target="_blank"
+                                                    class="size-8 inline-flex items-center justify-center tracking-wide align-middle text-base border border-gray-800 dark:border-gray-700 rounded-md hover:bg-red-500 hover:text-white text-slate-300"><i
+                                                        data-feather="instagram" class="size-4 align-middle"
+                                                        title="instagram"></i></a></li>
+                                            <li class="inline"><a href="https://wa.me/+918086602888" target="_blank"
+                                                    class="size-8 inline-flex items-center justify-center tracking-wide align-middle text-base border border-gray-800 dark:border-gray-700 rounded-md hover:bg-red-500 hover:text-white text-slate-300"><i
+                                                        data-feather="message-circle" class="size-4 align-middle"
+                                                        title="whatsapp"></i></a></li>
+                                            <li class="inline"><a href="mailto:admin@joannaholidays.com"
+                                                    class="size-8 inline-flex items-center justify-center tracking-wide align-middle text-base border border-gray-800 dark:border-gray-700 rounded-md hover:bg-red-500 hover:text-white text-slate-300"><i
+                                                        data-feather="mail" class="size-4 align-middle" title="email"></i></a>
+                                            </li>
+                                        </ul><!--end icon-->
                                 </div><!--end col-->
     
                                 <div class="lg:col-span-3 md:col-span-4">
@@ -378,8 +374,7 @@
                                         <div class="flex mt-4">
                                             <i data-feather="phone" class="size-4 text-red-500 me-2 mt-1"></i>
                                             <div class="">
-                                                <a href="tel:
-                                                    +918086602888"
+                                                <a href="tel:+918086602888"
                                                     class="text-slate-300 hover:text-slate-400 duration-500 ease-in-out">
                                                     +91 8086602888</a>
                                             </div>
@@ -416,23 +411,31 @@
                                     <h5 class="tracking-[1px] text-gray-100 font-semibold">Enquiry</h5>
                                     <p class="mt-6">Stay connected with Joanna Holidays for booking Or enquiries reach out
                                         to us anytime</p>
-                                    <form>
-                                        <div class="grid grid-cols-1">
-                                            <div class="my-3">
-    
-                                                <div class="form-icon relative mt-2">
-                                                    <i data-feather="mail" class="size-4 absolute top-3 start-4"></i>
-                                                    <input type="text"
-                                                        class="ps-12 rounded w-full py-2 px-3 h-10 bg-gray-800 dark:bg-gray-700 border-0 text-gray-100 focus:shadow-none focus:ring-0 placeholder:text-gray-200 outline-none"
-                                                        placeholder="Type your enquiry message" name="email" required="">
+                                        <form onsubmit="event.preventDefault(); sendToWhatsApp();">
+                                            <div class="grid grid-cols-1">
+                                                <div class="my-3">
+                                                    <div class="form-icon relative mt-2">
+                                                        <i data-feather="mail" class="size-4 absolute top-3 start-4"></i>
+                                                        <input type="text" id="enquiryMessage"
+                                                            class="ps-12 rounded w-full py-2 px-3 h-10 bg-gray-800 dark:bg-gray-700 border-0 text-gray-100 focus:shadow-none focus:ring-0 placeholder:text-gray-200 outline-none"
+                                                            placeholder="Type your enquiry message" required>
+                                                    </div>
                                                 </div>
+        
+                                                <button type="submit"
+                                                    class="py-2 px-5 inline-block font-semibold tracking-wide align-middle duration-500 text-base text-center bg-red-500 text-white rounded-md cursor-pointer">SEND
+                                                    ENQUIRY</button>
                                             </div>
-    
-                                            <button type="submit" id="submitsubscribe" name="send"
-                                                class="py-2 px-5 inline-block font-semibold tracking-wide align-middle duration-500 text-base text-center bg-red-500 text-white rounded-md">SEND
-                                                ENQUIRY</button>
-                                        </div>
-                                    </form>
+                                        </form>
+        
+                                        <script>
+                                            function sendToWhatsApp() {
+                                                const message = document.getElementById('enquiryMessage').value;
+                                                const whatsappNumber = '+918086602888';
+                                                const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+                                                window.open(whatsappUrl, '_blank');
+                                            }
+                                        </script>
                                 </div><!--end col-->
                             </div><!--end grid-->
                         </div><!--end col-->
@@ -450,11 +453,11 @@
                         
                         <!-- Legal links -->
                         <div class="flex items-center gap-4">
-                            <a href="privacy.html" 
+                            <a href="#" 
                                class="text-gray-400 dark:text-gray-300 hover:text-gray-500 dark:hover:text-gray-400 text-sm transition-colors duration-300 flex items-center">
                                 <i class="mdi mdi-chevron-right text-xs mr-1"></i> Privacy Policy
                             </a>
-                            <a href="terms.html" 
+                            <a href="#" 
                                class="text-gray-400 dark:text-gray-300 hover:text-gray-500 dark:hover:text-gray-400 text-sm transition-colors duration-300 flex items-center">
                                 <i class="mdi mdi-chevron-right text-xs mr-1"></i> Terms & Conditions
                             </a>
@@ -497,7 +500,7 @@
             </a>
         
             <!-- Services -->
-            <a href="packages.html" class="custom-nav__menu-item" id="servicesNavItem">
+            <a href="/packages" class="custom-nav__menu-item" id="servicesNavItem">
                 <svg class="custom-nav__icon" viewBox="0 0 24 24">
                     <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
                     <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
