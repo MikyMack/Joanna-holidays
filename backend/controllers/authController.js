@@ -3,8 +3,7 @@ const User = require('../models/User');
 
 exports.login = async (req, res) => {
     const { email, password } = req.body;
-
-  
+    
     if (email === 'admin@Joanna.com' && password === 'admin@admin') {
         req.session.user = { email };
         res.redirect('/dashboard');
